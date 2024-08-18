@@ -6,7 +6,22 @@
     <title>Kenish K C | Python SQL Power BI</title>
     <link rel="stylesheet" href="static/assets/vendors/themify-icons/css/themify-icons.css">
 	<link rel="stylesheet" href="static/assets/css/johndoe.css">
-</head>
+    <style>
+        .header {
+            --background-image: url('{{ image_url }}');
+            position: relative;
+            height: 80vh;
+            min-height: 600px;
+            background-image: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), var(--background-image);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #fff;
+        }
+    </style>
+</head> 
+
 <body data-spy="scroll" data-target=".navbar" data-offset="40" id="home">
     <a href="components.html" class="btn btn-primary btn-component" data-spy="affix" data-offset-top="600"><i class="ti-shift-left-alt"></i> Components</a>
     <header class="header">
@@ -19,10 +34,17 @@
                 <li class="social-item"><a class="social-link text-light" href="#"><i class="ti-github" aria-hidden="true"></i></a></li>
             </ul>  
             <div class="header-content">
-                <h4 class="header-subtitle" >Hello, I am</h4>
-                <h1 class="header-title">John Doe</h1>
-                <h6 class="header-mono" >Frond end Designer | Developer</h6>
-                <button class="btn btn-primary btn-rounded"><i class="ti-printer pr-2"></i>Print Resume</button>
+                <h4 class="header-subtitle" style="font-size: 175%;" >{{info.subtitle}}</h4>
+                <h1 class="header-title"  style="font-size: 300%;" >{{ info.title }}</h1>
+                <h6 class="header-mono" >{{info.position}}</h6>
+                {% if user.upload_cv %}
+            <a href="{% url 'download_cv' user.id %}" class="btn btn-primary btn-rounded">
+                <i class="ti-printer pr-2"></i> Download CV
+            </a>
+                {% else %}
+                    <p>No CV uploaded.</p>
+                {% endif %}
+               
             </div>
         </div>
     </header>
@@ -44,10 +66,10 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav brand">
-                    <img src="static/assets/imgs/avatar.jpg" alt="" class="brand-img">
+                    <img src={{user.profile_pic.url}} alt="" class="brand-img">
                     <li class="brand-txt">
-                        <h5 class="brand-title">John Doe</h5>
-                        <div class="brand-subtitle">Web Designer | Developer</div>
+                        <h5 class="brand-title">{{info.title}}</h5>
+                        <div class="brand-subtitle">{{info.position}}</div>
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto">
@@ -69,19 +91,17 @@
             <div class="col-lg-4 about-card">
                 <h3 class="font-weight-light">Who am I ?</h3>
                 <span class="line mb-5"></span>
-                <h5 class="mb-3">A Web Designer / Developer Located In Our Lovely Earth</h5>
-                <p class="mt-20">Lorem ipsum dolor sit amet, consectetur adipisicing elit.sit amet, Qui deserunt consequatur fugit repellendusillo voluptas?</p>
-                <button class="btn btn-outline-danger"><i class="icon-down-circled2 "></i>Download My CV</button>
+                <p class="mt-20">{{user.description}}</p>
+               
             </div>
             <div class="col-lg-4 about-card">
                 <h3 class="font-weight-light">Personal Info</h3>
                 <span class="line mb-5"></span>
                 <ul class="mt40 info list-unstyled">
-                    <li><span>Birthdate</span> : 09/13/1996</li>
-                    <li><span>Email</span> : info@website.com</li>
-                    <li><span>Phone</span> : + (123) 456-7890</li>
-                    <li><span>Skype</span> : John_Doe </li>
-                    <li><span>Address</span> :  12345 Fake ST NoWhere AB Country.</li>
+                    <li><span>Birthdate</span> : {{user.date_of_birth}}</li>
+                    <li><span>Email</span> : {{user.email}}</li>
+                    <li><span>Phone</span> : + (61) {{user.phone_number}}</li>
+                    <li><span>Address</span> :  {{user.address}}</li>
                 </ul>
                 <ul class="social-icons pt-3">
                     <li class="social-item"><a class="social-link" href="#"><i class="ti-facebook" aria-hidden="true"></i></a></li>
@@ -128,51 +148,58 @@
             <h2 class="mb-5"><span class="text-danger">My</span> Resume</h2>
             <div class="row">
                 <div class="col-md-6 col-lg-4">
-                    <div class="card">
-                       <div class="card-header">
+                        <div class="card">
+                        <div class="card-header">
                             <div class="mt-2">
                                 <h4>Expertise</h4>
-                                <span class="line"></span>  
+                                <span class="line"></span>
                             </div>
                         </div>
                         <div class="card-body">
-                            <h6 class="title text-danger">2017 - Present</h6>
-                            <P>UX Developer</P>
-                            <P class="subtitle">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nostrum recusandae, cupiditate ullam dolor ratione repellendus.aliquid repudiandae saepe!.</P>
-                            <hr>
-                            <h6 class="title text-danger">2016 - 2017</h6>
-                            <P>Front-end Developer</P>
-                            <P class="subtitle">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nostrum recusandae, cupiditate ullam dolor ratione repellendus.aliquid repudiandae saepe!.</P>
-                            <hr>
-                            <h6 class="title text-danger">2015 - 2016</h6>
-                            <P>UX Designer</P>
-                            <P class="subtitle">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nostrum recusandae, cupiditate ullam dolor ratione repellendus.aliquid repudiandae saepe!.</P>
+                            {% for expertise in expertise_list %}
+                                <h6 class="title text-danger">
+                                    {% if expertise.end_date %}
+                                        {{ expertise.start_date|date:"Y" }} - {{ expertise.end_date|date:"Y" }}
+                                    {% else %}
+                                        {{ expertise.start_date|date:"Y" }} - Present
+                                    {% endif %}
+                                </h6>
+                                <p>{{ expertise.position }}</p>
+                                <p class="subtitle">{{ expertise.short_description }}</p>
+                                <hr>
+                            {% empty %}
+                                <p>No expertise records found.</p>
+                            {% endfor %}
                         </div>
                     </div>
+
+
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <div class="card">
-                       <div class="card-header">
-                            <div class="mt-2">
-                                <h4>Education</h4>
-                                <span class="line"></span>  
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="title text-danger">2017 - Present</h6>
-                            <P>B.E Computer Engineering</P>
-                            <P class="subtitle">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error corrupti recusandae obcaecati odit repellat ducimus cum, minus tempora aperiam at.</P>
-                            <hr>
-                            <h6 class="title text-danger">2016 - 2017</h6>
-                            <P>Diploma in Computer Engineering</P>
-                            <P class="subtitle">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, id officiis quas placeat quia voluptas dolorum rem animi nostrum quae.aliquid repudiandae saepe!.</P>
-                            <hr>
-                            <h6 class="title text-danger">2015 - 2016</h6>
-                            <P>High School Degree</P>
-                            <P class="subtitle">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nostrum recusandae, cupiditate ullam dolor ratione repellendus.aliquid repudiandae saepe!.</P>
-                            
+                   <div class="card">
+                    <div class="card-header">
+                        <div class="mt-2">
+                            <h4>Education</h4>
+                            <span class="line"></span>
                         </div>
                     </div>
+                    <div class="card-body">
+                        {% for education in education_list %}
+                            <h6 class="title text-danger">
+                                {% if education.end_date %}
+                                    {{ education.start_date|date:"Y" }} - {{ education.end_date|date:"Y" }}
+                                {% else %}
+                                    {{ education.start_date|date:"Y" }} - Present
+                                {% endif %}
+                            </h6>
+                            <p>{{ education.title }}</p>
+                            <p class="subtitle">{{ education.short_description }}</p>
+                            <hr>
+                        {% empty %}
+                            <p>No education records found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="card">
@@ -236,7 +263,7 @@
         </div>
     </section>
 
-    <section class="section bg-dark text-center">
+    {% comment %} <section class="section bg-dark text-center">
         <div class="container">
             <div class="row text-center">
                 <div class="col-md-6 col-lg-3">
@@ -285,9 +312,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> {% endcomment %}
 
-    <section class="section" id="service">
+    {% comment %} <section class="section" id="service">
         <div class="container">
             <h2 class="mb-5 pb-4"><span class="text-danger">My</span> Services</h2>
             <div class="row">
@@ -360,93 +387,17 @@
             </div>
         </div>
     </section>
-
-    <section class="section bg-custom-gray" id="price">
-        <div class="container">
-            <h1 class="mb-5"><span class="text-danger">Packs</span> Pricing</h1>
-            <div class="row align-items-center">
-                <div class="col-md-6 col-lg-3">
-                    <div class="price-card text-center mb-4">
-                        <h3 class="price-card-title">Free</h3>
-                        <div class="price-card-cost">
-                            <sup class="ti-money"></sup>
-                            <span class="num">0</span>
-                            <span class="date">MO</span>
-                        </div>
-                        <ul class="list">
-                            <li class="list-item">5 <span class="text-muted">Project</span></li>
-                            <li class="list-item">1GB <span class="text-muted">Storage</span></li>
-                            <li class="list-item"><span class="text-muted">No Domain</span></li>
-                            <li class="list-item">1 <span class="text-muted">User</span></li>
-                        </ul>
-                        <button class="btn btn-primary btn-rounded w-lg">Subscribe</button>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="price-card text-center mb-4">
-                        <h3 class="price-card-title">Basic</h3>
-                        <div class="price-card-cost">
-                            <sup class="ti-money"></sup>
-                            <span class="num">10</span>
-                            <span class="date">MO</span>
-                        </div>
-                        <ul class="list">
-                            <li class="list-item">50 <span class="text-muted">Project</span></li>
-                            <li class="list-item">10GB <span class="text-muted">Storage</span></li>
-                            <li class="list-item">1<span class="text-muted">Domain</span></li>
-                            <li class="list-item">5 <span class="text-muted">User</span></li>
-                        </ul>
-                        <button class="btn btn-primary btn-rounded w-lg">Subscribe</button>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="price-card text-center price-card-requried mb-4">
-                        <h3 class="price-card-title">Exclusive</h3>
-                        <div class="price-card-cost">
-                            <sup class="ti-money"></sup>
-                            <span class="num">25</span>
-                            <span class="date">MO</span>
-                        </div>
-                        <ul class="list">
-                            <li class="list-item">150 <span class="text-muted">Project</span></li>
-                            <li class="list-item">15GB <span class="text-muted">Storage</span></li>
-                            <li class="list-item">5<span class="text-muted"> Domain</span></li>
-                            <li class="list-item">15<span class="text-muted">User</span></li>
-                        </ul>
-                        <button class="btn btn-primary btn-rounded w-lg">Subscribe</button>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="price-card text-center mb-4">
-                        <h3 class="price-card-title">Pro</h3>
-                        <div class="price-card-cost">
-                            <sup class="ti-money"></sup>
-                            <span class="num">99</span>
-                            <span class="date">MO</span>
-                        </div>
-                        <ul class="list">
-                            <li class="list-item">500 <span class="text-muted">Project</span></li>
-                            <li class="list-item">1000GB <span class="text-muted">Storage</span></li>
-                            <li class="list-item">10<span class="text-muted"> Domain</span></li>
-                            <li class="list-item">Unlimite<span class="text-muted">User</span></li>
-                        </ul>
-                        <button class="btn btn-primary btn-rounded w-lg">Subscribe</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
     <section class="section bg-dark py-5">
         <div class="container text-center">
             <h2 class="text-light mb-5 font-weight-normal">I Am Available For FreeLance</h2>
             <button class="btn bg-primary w-lg" >Hire me</button>
         </div>
-    </section>
+    </section> {% endcomment %}
 
     <!-- Portfolio Section -->
     <section class="section bg-custom-gray" id="portfolio">
         <div class="container">
-            <h1 class="mb-5"><span class="text-danger">My</span> Portfolio</h1>
+            <h1 class="mb-5"><span class="text-danger">My</span> Project </h1>
             <div class="portfolio">
                 <div class="filters">
                     <a href="#" data-filter=".new" class="active">
